@@ -9,11 +9,21 @@ import {networkInterfaces} from 'os';
 
 export async function install(version: string): Promise<string> {
   core.startGroup(`Checking lodns ${version} release...`);
-  const release: github.GitHubRelease | null = await github.getRelease(version);
-  if (!release) {
-    throw new Error(`Cannot find lodns ${version} release`);
+  var semver:string;
+  if (version == 'latest') {
+    const release: string | null = await github.getLatestRelease();
+    if (!release) {
+      throw new Error(`Cannot find lodns latest release`);
+    }
+    semver = release.replace(/^v/, '');
+  } else {
+    const release: github.GitHubRelease | null = await github.getRelease(version);
+    if (!release) {
+      throw new Error(`Cannot find lodns ${version} release`);
+    }
+    semver = release.tag_name.replace(/^v/, '');
   }
-  const semver: string = release.tag_name.replace(/^v/, '');
+  // const semver: string = release.tag_name.replace(/^v/, '');
   core.info(`lodns ${semver} found`);
   core.endGroup();
 
